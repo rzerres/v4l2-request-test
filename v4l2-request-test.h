@@ -62,6 +62,7 @@ struct format_description {
 enum codec_type {
 	CODEC_TYPE_MPEG2,
 	CODEC_TYPE_H264,
+	CODEC_TYPE_H265,
 };
 
 enum pct {

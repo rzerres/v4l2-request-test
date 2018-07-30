@@ -106,6 +106,9 @@ static void print_summary(struct config *config, struct preset *preset)
 	case CODEC_TYPE_H264:
 		printf("H264");
 		break;
+	case CODEC_TYPE_H265:
+		printf("H265");
+		break;
 	default:
 		printf("Invalid");
 		break;

@@ -444,6 +444,8 @@ static int codec_source_format(enum codec_type type)
 		return V4L2_PIX_FMT_MPEG2_SLICE;
 	case CODEC_TYPE_H264:
 		return V4L2_PIX_FMT_H264_SLICE;
+	case CODEC_TYPE_H265:
+		return V4L2_PIX_FMT_HEVC_SLICE;
 	default:
 		fprintf(stderr, "Invalid format type\n");
 		return -1;
