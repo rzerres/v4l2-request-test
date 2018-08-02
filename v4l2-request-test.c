@@ -456,7 +456,8 @@ int main(int argc, char *argv[])
 			goto error;
 		}
 
-		if (preset->type == CODEC_TYPE_H264)
+		if (preset->type == CODEC_TYPE_H264 ||
+		    preset->type == CODEC_TYPE_H265)
 			v4l2_index = frame.output_buffer;
 		else
 			v4l2_index = index % config.buffers_count;
