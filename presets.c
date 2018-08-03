@@ -128,7 +128,7 @@ static struct preset presets[] = {
 	},
 	{
 		.name = "caminandes-h265-intra",
-		.description = "Caminandes 2: Gran Dillama",
+		.description = "Caminandes 2: Gran Dillema",
 		.license = "Creative Commons Attribution 3.0",
 		.attribution = "(CC) caminandes.com",
 		.width = 640,
