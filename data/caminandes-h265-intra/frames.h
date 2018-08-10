@@ -66,7 +66,7 @@
 			},
 			.slice_params = {
 				.bit_size = 1089920,
-				.data_bit_offset = 128,
+				.data_bit_offset = 136,
 				.nal_unit_type = 20,
 				.nuh_temporal_id_plus1 = 1,
 				.slice_type = 2,
@@ -168,7 +168,7 @@
 			},
 			.slice_params = {
 				.bit_size = 759856,
-				.data_bit_offset = 120,
+				.data_bit_offset = 128,
 				.nal_unit_type = 20,
 				.nuh_temporal_id_plus1 = 1,
 				.slice_type = 2,
@@ -270,7 +270,7 @@
 			},
 			.slice_params = {
 				.bit_size = 760400,
-				.data_bit_offset = 120,
+				.data_bit_offset = 128,
 				.nal_unit_type = 20,
 				.nuh_temporal_id_plus1 = 1,
 				.slice_type = 2,
@@ -372,7 +372,7 @@
 			},
 			.slice_params = {
 				.bit_size = 759984,
-				.data_bit_offset = 120,
+				.data_bit_offset = 128,
 				.nal_unit_type = 20,
 				.nuh_temporal_id_plus1 = 1,
 				.slice_type = 2,
@@ -474,7 +474,7 @@
 			},
 			.slice_params = {
 				.bit_size = 760088,
-				.data_bit_offset = 120,
+				.data_bit_offset = 128,
 				.nal_unit_type = 20,
 				.nuh_temporal_id_plus1 = 1,
 				.slice_type = 2,
@@ -576,7 +576,7 @@
 			},
 			.slice_params = {
 				.bit_size = 761064,
-				.data_bit_offset = 120,
+				.data_bit_offset = 128,
 				.nal_unit_type = 20,
 				.nuh_temporal_id_plus1 = 1,
 				.slice_type = 2,
@@ -678,7 +678,7 @@
 			},
 			.slice_params = {
 				.bit_size = 761968,
-				.data_bit_offset = 120,
+				.data_bit_offset = 128,
 				.nal_unit_type = 20,
 				.nuh_temporal_id_plus1 = 1,
 				.slice_type = 2,
@@ -780,7 +780,7 @@
 			},
 			.slice_params = {
 				.bit_size = 764464,
-				.data_bit_offset = 120,
+				.data_bit_offset = 128,
 				.nal_unit_type = 20,
 				.nuh_temporal_id_plus1 = 1,
 				.slice_type = 2,
@@ -882,7 +882,7 @@
 			},
 			.slice_params = {
 				.bit_size = 762496,
-				.data_bit_offset = 120,
+				.data_bit_offset = 128,
 				.nal_unit_type = 20,
 				.nuh_temporal_id_plus1 = 1,
 				.slice_type = 2,
@@ -984,7 +984,7 @@
 			},
 			.slice_params = {
 				.bit_size = 763840,
-				.data_bit_offset = 120,
+				.data_bit_offset = 128,
 				.nal_unit_type = 20,
 				.nuh_temporal_id_plus1 = 1,
 				.slice_type = 2,
@@ -1086,7 +1086,7 @@
 			},
 			.slice_params = {
 				.bit_size = 767688,
-				.data_bit_offset = 120,
+				.data_bit_offset = 128,
 				.nal_unit_type = 20,
 				.nuh_temporal_id_plus1 = 1,
 				.slice_type = 2,
@@ -1188,7 +1188,7 @@
 			},
 			.slice_params = {
 				.bit_size = 766280,
-				.data_bit_offset = 120,
+				.data_bit_offset = 128,
 				.nal_unit_type = 20,
 				.nuh_temporal_id_plus1 = 1,
 				.slice_type = 2,
@@ -1290,7 +1290,7 @@
 			},
 			.slice_params = {
 				.bit_size = 766848,
-				.data_bit_offset = 120,
+				.data_bit_offset = 128,
 				.nal_unit_type = 20,
 				.nuh_temporal_id_plus1 = 1,
 				.slice_type = 2,
@@ -1392,7 +1392,7 @@
 			},
 			.slice_params = {
 				.bit_size = 766728,
-				.data_bit_offset = 120,
+				.data_bit_offset = 128,
 				.nal_unit_type = 20,
 				.nuh_temporal_id_plus1 = 1,
 				.slice_type = 2,
@@ -1494,7 +1494,7 @@
 			},
 			.slice_params = {
 				.bit_size = 767056,
-				.data_bit_offset = 120,
+				.data_bit_offset = 128,
 				.nal_unit_type = 20,
 				.nuh_temporal_id_plus1 = 1,
 				.slice_type = 2,
@@ -1596,7 +1596,7 @@
 			},
 			.slice_params = {
 				.bit_size = 767592,
-				.data_bit_offset = 120,
+				.data_bit_offset = 128,
 				.nal_unit_type = 20,
 				.nuh_temporal_id_plus1 = 1,
 				.slice_type = 2,
@@ -1698,7 +1698,7 @@
 			},
 			.slice_params = {
 				.bit_size = 766656,
-				.data_bit_offset = 120,
+				.data_bit_offset = 128,
 				.nal_unit_type = 20,
 				.nuh_temporal_id_plus1 = 1,
 				.slice_type = 2,
@@ -1800,7 +1800,7 @@
 			},
 			.slice_params = {
 				.bit_size = 767952,
-				.data_bit_offset = 120,
+				.data_bit_offset = 128,
 				.nal_unit_type = 20,
 				.nuh_temporal_id_plus1 = 1,
 				.slice_type = 2,
@@ -1902,7 +1902,7 @@
 			},
 			.slice_params = {
 				.bit_size = 770104,
-				.data_bit_offset = 120,
+				.data_bit_offset = 128,
 				.nal_unit_type = 20,
 				.nuh_temporal_id_plus1 = 1,
 				.slice_type = 2,
@@ -2004,7 +2004,7 @@
 			},
 			.slice_params = {
 				.bit_size = 771312,
-				.data_bit_offset = 120,
+				.data_bit_offset = 128,
 				.nal_unit_type = 20,
 				.nuh_temporal_id_plus1 = 1,
 				.slice_type = 2,
@@ -2106,7 +2106,7 @@
 			},
 			.slice_params = {
 				.bit_size = 771808,
-				.data_bit_offset = 120,
+				.data_bit_offset = 128,
 				.nal_unit_type = 20,
 				.nuh_temporal_id_plus1 = 1,
 				.slice_type = 2,
@@ -2208,7 +2208,7 @@
 			},
 			.slice_params = {
 				.bit_size = 771872,
-				.data_bit_offset = 120,
+				.data_bit_offset = 128,
 				.nal_unit_type = 20,
 				.nuh_temporal_id_plus1 = 1,
 				.slice_type = 2,
@@ -2310,7 +2310,7 @@
 			},
 			.slice_params = {
 				.bit_size = 773016,
-				.data_bit_offset = 120,
+				.data_bit_offset = 128,
 				.nal_unit_type = 20,
 				.nuh_temporal_id_plus1 = 1,
 				.slice_type = 2,
@@ -2412,7 +2412,7 @@
 			},
 			.slice_params = {
 				.bit_size = 771992,
-				.data_bit_offset = 120,
+				.data_bit_offset = 128,
 				.nal_unit_type = 20,
 				.nuh_temporal_id_plus1 = 1,
 				.slice_type = 2,
@@ -2514,7 +2514,7 @@
 			},
 			.slice_params = {
 				.bit_size = 773224,
-				.data_bit_offset = 120,
+				.data_bit_offset = 128,
 				.nal_unit_type = 20,
 				.nuh_temporal_id_plus1 = 1,
 				.slice_type = 2,
