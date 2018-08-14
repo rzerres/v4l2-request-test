@@ -1632,7 +1632,7 @@
 	},
 	{
 		.index = 16,
-		.output_buffer = 16,
+		.output_buffer = 0,
 		.frame.h265 = {
 			.sps = {
 				.chroma_format_idc = 1,
@@ -1734,7 +1734,7 @@
 	},
 	{
 		.index = 17,
-		.output_buffer = 17,
+		.output_buffer = 1,
 		.frame.h265 = {
 			.sps = {
 				.chroma_format_idc = 1,
@@ -1836,7 +1836,7 @@
 	},
 	{
 		.index = 18,
-		.output_buffer = 18,
+		.output_buffer = 2,
 		.frame.h265 = {
 			.sps = {
 				.chroma_format_idc = 1,
@@ -1938,7 +1938,7 @@
 	},
 	{
 		.index = 19,
-		.output_buffer = 19,
+		.output_buffer = 3,
 		.frame.h265 = {
 			.sps = {
 				.chroma_format_idc = 1,
@@ -2040,7 +2040,7 @@
 	},
 	{
 		.index = 20,
-		.output_buffer = 20,
+		.output_buffer = 4,
 		.frame.h265 = {
 			.sps = {
 				.chroma_format_idc = 1,
@@ -2142,7 +2142,7 @@
 	},
 	{
 		.index = 21,
-		.output_buffer = 21,
+		.output_buffer = 5,
 		.frame.h265 = {
 			.sps = {
 				.chroma_format_idc = 1,
@@ -2244,7 +2244,7 @@
 	},
 	{
 		.index = 22,
-		.output_buffer = 22,
+		.output_buffer = 6,
 		.frame.h265 = {
 			.sps = {
 				.chroma_format_idc = 1,
@@ -2346,7 +2346,7 @@
 	},
 	{
 		.index = 23,
-		.output_buffer = 23,
+		.output_buffer = 7,
 		.frame.h265 = {
 			.sps = {
 				.chroma_format_idc = 1,
@@ -2448,7 +2448,7 @@
 	},
 	{
 		.index = 24,
-		.output_buffer = 24,
+		.output_buffer = 8,
 		.frame.h265 = {
 			.sps = {
 				.chroma_format_idc = 1,
