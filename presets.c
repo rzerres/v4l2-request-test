@@ -269,19 +269,6 @@ unsigned int frame_pct(struct preset *preset, unsigned int index)
 		default:
 			return PCT_I;
 		}
-	case CODEC_TYPE_H265:
-		type = preset->frames[index].frame.h265.slice_params.slice_type;
-
-		switch (type) {
-		case V4L2_HEVC_SLICE_TYPE_I:
-			return PCT_I;
-		case V4L2_HEVC_SLICE_TYPE_P:
-			return PCT_P;
-		case V4L2_HEVC_SLICE_TYPE_B:
-			return PCT_B;
-		default:
-			return PCT_I;
-		}
 	default:
 		return PCT_I;
 	}
