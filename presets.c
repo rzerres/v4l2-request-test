@@ -210,6 +210,9 @@ int frame_controls_fill(struct frame *frame, struct preset *preset,
 			unsigned int buffers_count, unsigned int index,
 			unsigned int slice_size)
 {
+	unsigned int count;
+	unsigned int i;
+
 	if (frame == NULL || preset == NULL)
 		return -1;
 
@@ -230,7 +233,13 @@ int frame_controls_fill(struct frame *frame, struct preset *preset,
 			buffers_count;
 		break;
 	case CODEC_TYPE_H264:
+		break;
 	case CODEC_TYPE_H265:
+		count = frame->frame.h265.slice_params.num_active_dpb_entries;
+
+		for (i = 0; i < count; i++)
+			frame->frame.h265.slice_params.dpb[i].buffer_index %=
+				buffers_count;
 		break;
 	default:
 		return -1;
@@ -241,17 +250,34 @@ int frame_controls_fill(struct frame *frame, struct preset *preset,
 
 unsigned int frame_pct(struct preset *preset, unsigned int index)
 {
+	unsigned int type;
+
 	if (preset == NULL)
 		return PCT_I;
 
 	switch (preset->type) {
 	case CODEC_TYPE_MPEG2:
-		switch (preset->frames[index].frame.mpeg2.slice_params.picture.picture_coding_type) {
+		type = preset->frames[index].frame.mpeg2.slice_params.picture.picture_coding_type;
+
+		switch (type) {
 		case V4L2_MPEG2_PICTURE_CODING_TYPE_I:
 			return PCT_I;
 		case V4L2_MPEG2_PICTURE_CODING_TYPE_P:
 			return PCT_P;
 		case V4L2_MPEG2_PICTURE_CODING_TYPE_B:
+			return PCT_B;
+		default:
+			return PCT_I;
+		}
+	case CODEC_TYPE_H265:
+		type = preset->frames[index].frame.h265.slice_params.slice_type;
+
+		switch (type) {
+		case V4L2_HEVC_SLICE_TYPE_I:
+			return PCT_I;
+		case V4L2_HEVC_SLICE_TYPE_P:
+			return PCT_P;
+		case V4L2_HEVC_SLICE_TYPE_B:
 			return PCT_B;
 		default:
 			return PCT_I;

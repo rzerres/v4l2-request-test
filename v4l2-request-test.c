@@ -456,8 +456,8 @@ int main(int argc, char *argv[])
 			goto error;
 		}
 
-		if (preset->type == CODEC_TYPE_H264 ||
-		    preset->type == CODEC_TYPE_H265)
+		/* FIXME: Do we need another index for H265? */
+		if (preset->type == CODEC_TYPE_H264)
 			v4l2_index = frame.output_buffer;
 		else
 			v4l2_index = index % config.buffers_count;
