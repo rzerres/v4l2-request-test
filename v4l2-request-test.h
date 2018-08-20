@@ -112,6 +112,7 @@ struct preset {
 	enum codec_type type;
 	struct frame *frames;
 	unsigned int frames_count;
+	unsigned int display_count;
 };
 
 /* V4L2 */

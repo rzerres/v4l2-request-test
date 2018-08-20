@@ -285,8 +285,31 @@ unsigned int frame_pct(struct preset *preset, unsigned int index)
 		default:
 			return PCT_I;
 		}
+	case CODEC_TYPE_H265:
+		type = preset->frames[index].frame.h265.slice_params.slice_type;
+
+		switch (type) {
+		case V4L2_HEVC_SLICE_TYPE_I:
+			return PCT_I;
+		case V4L2_HEVC_SLICE_TYPE_P:
+			return PCT_P;
+		case V4L2_HEVC_SLICE_TYPE_B:
+			return PCT_B;
+		default:
+			return PCT_I;
+		}
 	default:
 		return PCT_I;
+	}
+}
+
+unsigned int frame_poc(struct preset *preset, unsigned int index)
+{
+	switch (preset->type) {
+	case CODEC_TYPE_H265:
+		return preset->frames[index].frame.h265.slice_params.pic_order_cnt;
+	default:
+		return 0;
 	}
 }
 
@@ -340,7 +363,7 @@ int frame_gop_queue(unsigned int index)
 	return 0;
 }
 
-int frame_gop_schedule(struct preset *preset, unsigned int index)
+int frame_gop_schedule_ref(struct preset *preset, unsigned int index)
 {
 	unsigned int gop_start_index;
 	unsigned int pct, pct_next;
@@ -400,4 +423,56 @@ int frame_gop_schedule(struct preset *preset, unsigned int index)
 	}
 
 	return rc;
+}
+
+int frame_gop_schedule_poc(struct preset *preset, unsigned int index)
+{
+	unsigned int gop_start_index = index;
+	unsigned int pct;
+	unsigned int poc, poc_next;
+	int rc;
+
+	pct = frame_pct(preset, index);
+
+	/* Only perform scheduling at GOP start. */
+	if (pct != PCT_I)
+		return 0;
+
+	poc = frame_poc(preset, index);
+	frame_gop_queue(index);
+
+	rc = 0;
+
+	for (index = gop_start_index; index < preset->frames_count; index++) {
+		pct = frame_pct(preset, index);
+
+		/* I frames mark GOP end. */
+		if (pct == PCT_I && index > gop_start_index)
+			break;
+
+		poc_next = frame_poc(preset, index);
+		if (poc_next == poc + 1) {
+			rc |= frame_gop_queue(index);
+			poc = poc_next;
+
+			index = gop_start_index;
+			continue;
+		}
+	}
+
+	/* We might be missing predicted frames. */
+	if (index == preset->frames_count)
+		preset->display_count = poc + 1;
+
+	return rc;
+}
+
+int frame_gop_schedule(struct preset *preset, unsigned int index)
+{
+	switch (preset->type) {
+	case CODEC_TYPE_H265:
+		return frame_gop_schedule_poc(preset, index);
+	default:
+		return frame_gop_schedule_ref(preset, index);
+	}
 }
