@@ -307,7 +307,7 @@ unsigned int frame_poc(struct preset *preset, unsigned int index)
 {
 	switch (preset->type) {
 	case CODEC_TYPE_H265:
-		return preset->frames[index].frame.h265.slice_params.pic_order_cnt;
+		return preset->frames[index].frame.h265.slice_params.slice_pic_order_cnt;
 	default:
 		return 0;
 	}
