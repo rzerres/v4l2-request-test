@@ -427,7 +427,7 @@ int frame_gop_schedule_ref(struct preset *preset, unsigned int index)
 
 int frame_gop_schedule_poc(struct preset *preset, unsigned int index)
 {
-	unsigned int gop_start_index = index;
+	unsigned int gop_start_index = index + 1;
 	unsigned int pct;
 	unsigned int poc, poc_next;
 	int rc;
@@ -447,7 +447,7 @@ int frame_gop_schedule_poc(struct preset *preset, unsigned int index)
 		pct = frame_pct(preset, index);
 
 		/* I frames mark GOP end. */
-		if (pct == PCT_I && index > gop_start_index)
+		if (pct == PCT_I)
 			break;
 
 		poc_next = frame_poc(preset, index);
@@ -461,7 +461,8 @@ int frame_gop_schedule_poc(struct preset *preset, unsigned int index)
 	}
 
 	/* We might be missing predicted frames. */
-	if (index == preset->frames_count)
+	if (index == preset->frames_count &&
+	    index != gop_start_index)
 		preset->display_count = poc + 1;
 
 	return rc;
