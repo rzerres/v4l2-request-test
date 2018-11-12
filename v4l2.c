@@ -323,7 +323,7 @@ static int request_buffers(int video_fd, unsigned int type,
 }
 
 static int queue_buffer(int video_fd, int request_fd, unsigned int type,
-			unsigned int index, unsigned int size,
+			uint32_t tag, unsigned int index, unsigned int size,
 			unsigned int buffers_count)
 {
 	struct v4l2_plane planes[buffers_count];
@@ -350,6 +350,9 @@ static int queue_buffer(int video_fd, int request_fd, unsigned int type,
 		buffer.flags = V4L2_BUF_FLAG_REQUEST_FD;
 		buffer.request_fd = request_fd;
 	}
+
+	buffer.tag = tag;
+	buffer.flags |= V4L2_BUF_FLAG_TAG;
 
 	rc = ioctl(video_fd, VIDIOC_QBUF, &buffer);
 	if (rc < 0) {
@@ -855,7 +858,7 @@ int video_engine_stop(int video_fd, struct video_buffer *buffers,
 }
 
 int video_engine_decode(int video_fd, unsigned int index, union controls *frame,
-			enum codec_type type, void *source_data,
+			enum codec_type type, uint32_t tag, void *source_data,
 			unsigned int source_size, struct video_buffer *buffers,
 			struct video_setup *setup)
 {
@@ -875,14 +878,14 @@ int video_engine_decode(int video_fd, unsigned int index, union controls *frame,
 		return -1;
 	}
 
-	rc = queue_buffer(video_fd, request_fd, setup->output_type, index,
+	rc = queue_buffer(video_fd, request_fd, setup->output_type, tag, index,
 			  source_size, 1);
 	if (rc < 0) {
 		fprintf(stderr, "Unable to queue source buffer\n");
 		return -1;
 	}
 
-	rc = queue_buffer(video_fd, -1, setup->capture_type, index, 0,
+	rc = queue_buffer(video_fd, -1, setup->capture_type, 0, index, 0,
 			  buffers[index].destination_buffers_count);
 	if (rc < 0) {
 		fprintf(stderr, "Unable to queue destination buffer\n");
