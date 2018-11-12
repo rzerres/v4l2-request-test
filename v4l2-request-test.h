@@ -202,7 +202,7 @@ int frame_controls_fill(struct frame *frame, struct preset *preset,
 			unsigned int buffers_count, unsigned int index,
 			unsigned int slice_size);
 unsigned int frame_pct(struct preset *preset, unsigned int index);
-unsigned int frame_backward_ref_index(struct preset *preset,
+unsigned int frame_backward_ref_tag(struct preset *preset,
 				      unsigned int index);
 int frame_gop_next(unsigned int *index);
 int frame_gop_dequeue(void);

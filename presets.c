@@ -163,10 +163,6 @@ int frame_controls_fill(struct frame *frame, struct preset *preset,
 
 	switch (preset->type) {
 	case CODEC_TYPE_MPEG2:
-		frame->frame.mpeg2.slice_params.forward_ref_index %=
-			buffers_count;
-		frame->frame.mpeg2.slice_params.backward_ref_index %=
-			buffers_count;
 		break;
 	case CODEC_TYPE_H264:
 		break;
@@ -233,14 +229,14 @@ unsigned int frame_poc(struct preset *preset, unsigned int index)
 	}
 }
 
-unsigned int frame_backward_ref_index(struct preset *preset, unsigned int index)
+unsigned int frame_backward_ref_tag(struct preset *preset, unsigned int index)
 {
 	if (preset == NULL)
 		return 0;
 
 	switch (preset->type) {
 	case CODEC_TYPE_MPEG2:
-		return preset->frames[index].frame.mpeg2.slice_params.backward_ref_index;
+		return preset->frames[index].frame.mpeg2.slice_params.backward_ref_tag;
 	default:
 		return 0;
 	}
@@ -287,7 +283,7 @@ int frame_gop_schedule_ref(struct preset *preset, unsigned int index)
 {
 	unsigned int gop_start_index;
 	unsigned int pct, pct_next;
-	unsigned int backward_ref_index, backward_ref_index_next;
+	unsigned int backward_ref_tag, backward_ref_tag_next;
 	unsigned int i;
 	int rc;
 
@@ -309,16 +305,20 @@ int frame_gop_schedule_ref(struct preset *preset, unsigned int index)
 
 	rc = 0;
 
+	/*
+	 * FIXME: This assumes that tags are equivalent to the frame index,
+	 * which is currently the case for our samples but not generally true.
+	 */
 	for (gop_start_index = index; index < preset->frames_count; index++) {
 		pct = frame_pct(preset, index);
-		backward_ref_index = frame_backward_ref_index(preset, index);
+		backward_ref_tag = frame_backward_ref_tag(preset, index);
 
 		/* I frames mark GOP end. */
 		if (pct == PCT_I && index > gop_start_index) {
 			break;
 		} else if (pct == PCT_B) {
 			/* The required backward reference frame is already available, queue now. */
-			if (backward_ref_index >= index)
+			if (backward_ref_tag >= index)
 				rc |= frame_gop_queue(index);
 
 			/* The B frame was already queued before the associated backward reference frame. */
@@ -328,13 +328,13 @@ int frame_gop_schedule_ref(struct preset *preset, unsigned int index)
 		/* Queue B frames before their associated backward reference frames. */
 		for (i = (index + 1); i < preset->frames_count; i++) {
 			pct_next = frame_pct(preset, i);
-			backward_ref_index_next =
-				frame_backward_ref_index(preset, i);
+			backward_ref_tag_next =
+				frame_backward_ref_tag(preset, i);
 
 			if (pct_next != PCT_B)
 				continue;
 
-			if (backward_ref_index_next == index)
+			if (backward_ref_tag_next == index)
 				rc |= frame_gop_queue(i);
 		}
 
