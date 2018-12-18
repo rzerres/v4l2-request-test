@@ -205,7 +205,7 @@ int frame_controls_fill(struct frame *frame, struct preset *preset,
 			unsigned int buffers_count, unsigned int index,
 			unsigned int slice_size);
 unsigned int frame_pct(struct preset *preset, unsigned int index);
-unsigned int frame_backward_ref_tag(struct preset *preset,
+unsigned int frame_backward_ref_index(struct preset *preset,
 				      unsigned int index);
 int frame_gop_next(unsigned int *index);
 int frame_gop_dequeue(void);
@@ -225,7 +225,7 @@ int video_engine_start(int video_fd, int media_fd, unsigned int width,
 int video_engine_stop(int video_fd, struct video_buffer *buffers,
 		      unsigned int buffers_count, struct video_setup *setup);
 int video_engine_decode(int video_fd, unsigned int index, union controls *frame,
-			enum codec_type type, uint32_t tag, void *source_data,
+			enum codec_type type, uint64_t ts, void *source_data,
 			unsigned int source_size, struct video_buffer *buffers,
 			struct video_setup *setup);
 

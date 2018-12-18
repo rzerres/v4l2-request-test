@@ -862,7 +862,7 @@ int video_engine_stop(int video_fd, struct video_buffer *buffers,
 }
 
 int video_engine_decode(int video_fd, unsigned int index, union controls *frame,
-			enum codec_type type, uint32_t tag, void *source_data,
+			enum codec_type type, uint64_t ts, void *source_data,
 			unsigned int source_size, struct video_buffer *buffers,
 			struct video_setup *setup)
 {
@@ -882,7 +882,7 @@ int video_engine_decode(int video_fd, unsigned int index, union controls *frame,
 		return -1;
 	}
 
-	rc = queue_buffer(video_fd, request_fd, setup->output_type, tag, index,
+	rc = queue_buffer(video_fd, request_fd, setup->output_type, ts, index,
 			  source_size, 1);
 	if (rc < 0) {
 		fprintf(stderr, "Unable to queue source buffer\n");

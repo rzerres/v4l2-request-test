@@ -487,7 +487,7 @@ int main(int argc, char *argv[])
 		clock_gettime(CLOCK_MONOTONIC, &video_before);
 
 		rc = video_engine_decode(video_fd, v4l2_index, &frame.frame,
-					 preset->type, index, slice_data,
+					 preset->type, index * 1000, slice_data,
 					 slice_size, video_buffers,
 					 &video_setup);
 		if (rc < 0) {
