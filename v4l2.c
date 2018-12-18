@@ -32,6 +32,7 @@
 #include <mpeg2-ctrls.h>
 #include <h264-ctrls.h>
 #include <hevc-ctrls.h>
+#include <compat-pixfmt.h>
 
 #include "v4l2-request-test.h"
 
@@ -326,7 +327,7 @@ static int request_buffers(int video_fd, unsigned int type,
 }
 
 static int queue_buffer(int video_fd, int request_fd, unsigned int type,
-			uint32_t tag, unsigned int index, unsigned int size,
+			uint64_t ts, unsigned int index, unsigned int size,
 			unsigned int buffers_count)
 {
 	struct v4l2_plane planes[buffers_count];
@@ -354,8 +355,8 @@ static int queue_buffer(int video_fd, int request_fd, unsigned int type,
 		buffer.request_fd = request_fd;
 	}
 
-	buffer.tag = tag;
-	buffer.flags |= V4L2_BUF_FLAG_TAG;
+	buffer.timestamp.tv_usec = ts / 1000;
+	buffer.timestamp.tv_sec = ts / 1000000000ULL;
 
 	rc = ioctl(video_fd, VIDIOC_QBUF, &buffer);
 	if (rc < 0) {

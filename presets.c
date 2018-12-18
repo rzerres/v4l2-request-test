@@ -210,14 +210,14 @@ unsigned int frame_poc(struct preset *preset, unsigned int index)
 	}
 }
 
-unsigned int frame_backward_ref_ts(struct preset *preset, unsigned int index)
+unsigned int frame_backward_ref_index(struct preset *preset, unsigned int index)
 {
 	if (preset == NULL)
 		return 0;
 
 	switch (preset->type) {
 	case CODEC_TYPE_MPEG2:
-		return preset->frames[index].frame.mpeg2.slice_params.backward_ref_ts;
+		return preset->frames[index].frame.mpeg2.slice_params.backward_ref_ts / 1000;
 	default:
 		return 0;
 	}
@@ -287,12 +287,13 @@ int frame_gop_schedule_ref(struct preset *preset, unsigned int index)
 	rc = 0;
 
 	/*
-	 * FIXME: This assumes that tags are equivalent to the frame index,
-	 * which is currently the case for our samples but not generally true.
+	 * FIXME: This assumes that reference timestamps are related to the
+	 * frame index, which is currently the case for our samples but not
+	 * generally true.
 	 */
 	for (gop_start_index = index; index < preset->frames_count; index++) {
 		pct = frame_pct(preset, index);
-		backward_ref_ts = frame_backward_ref_ts(preset, index);
+		backward_ref_ts = frame_backward_ref_index(preset, index);
 
 		/* I frames mark GOP end. */
 		if (pct == PCT_I && index > gop_start_index) {
@@ -310,7 +311,7 @@ int frame_gop_schedule_ref(struct preset *preset, unsigned int index)
 		for (i = (index + 1); i < preset->frames_count; i++) {
 			pct_next = frame_pct(preset, i);
 			backward_ref_ts_next =
-				frame_backward_ref_ts(preset, i);
+				frame_backward_ref_index(preset, i);
 
 			if (pct_next != PCT_B)
 				continue;
