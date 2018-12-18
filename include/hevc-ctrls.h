@@ -15,6 +15,11 @@
 #define V4L2_CID_MPEG_VIDEO_HEVC_PPS			(V4L2_CID_MPEG_BASE + 646)
 #define V4L2_CID_MPEG_VIDEO_HEVC_SLICE_PARAMS		(V4L2_CID_MPEG_BASE + 647)
 
+/* enum v4l2_ctrl_type type values */
+#define V4L2_CTRL_TYPE_HEVC_SPS 0x0110
+#define	V4L2_CTRL_TYPE_HEVC_PPS 0x0111
+#define	V4L2_CTRL_TYPE_HEVC_SLICE_PARAMS 0x0112
+
 #define V4L2_HEVC_SLICE_TYPE_B	0
 #define V4L2_HEVC_SLICE_TYPE_P	1
 #define V4L2_HEVC_SLICE_TYPE_I	2
@@ -95,7 +100,7 @@ struct v4l2_ctrl_hevc_pps {
 #define V4L2_HEVC_DPB_ENTRIES_NUM_MAX		16
 
 struct v4l2_hevc_dpb_entry {
-	__u32	buffer_tag;
+	__u64	timestamp;
 	__u8	rps;
 	__u8	field_pic;
 	__u16	pic_order_cnt[2];

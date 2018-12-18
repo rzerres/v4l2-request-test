@@ -17,6 +17,13 @@
 #define V4L2_CID_MPEG_VIDEO_H264_SLICE_PARAMS	(V4L2_CID_MPEG_BASE+386)
 #define V4L2_CID_MPEG_VIDEO_H264_DECODE_PARAMS	(V4L2_CID_MPEG_BASE+387)
 
+/* enum v4l2_ctrl_type type values */
+#define V4L2_CTRL_TYPE_H264_SPS 0x0105
+#define	V4L2_CTRL_TYPE_H264_PPS 0x0106
+#define	V4L2_CTRL_TYPE_H264_SCALING_MATRIX 0x0107
+#define	V4L2_CTRL_TYPE_H264_SLICE_PARAMS 0x0108
+#define	V4L2_CTRL_TYPE_H264_DECODE_PARAMS 0x0109
+
 #define V4L2_H264_SPS_CONSTRAINT_SET0_FLAG			0x01
 #define V4L2_H264_SPS_CONSTRAINT_SET1_FLAG			0x02
 #define V4L2_H264_SPS_CONSTRAINT_SET2_FLAG			0x04
@@ -152,7 +159,7 @@ struct v4l2_ctrl_h264_slice_param {
 #define V4L2_H264_DPB_ENTRY_FLAG_LONG_TERM	0x04
 
 struct v4l2_h264_dpb_entry {
-	__u32 tag;
+	__u64 timestamp;
 	__u16 frame_num;
 	__u16 pic_num;
 	/* Note that field is indicated by v4l2_buffer.field */
