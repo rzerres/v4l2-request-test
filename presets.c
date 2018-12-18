@@ -210,14 +210,14 @@ unsigned int frame_poc(struct preset *preset, unsigned int index)
 	}
 }
 
-unsigned int frame_backward_ref_tag(struct preset *preset, unsigned int index)
+unsigned int frame_backward_ref_ts(struct preset *preset, unsigned int index)
 {
 	if (preset == NULL)
 		return 0;
 
 	switch (preset->type) {
 	case CODEC_TYPE_MPEG2:
-		return preset->frames[index].frame.mpeg2.slice_params.backward_ref_tag;
+		return preset->frames[index].frame.mpeg2.slice_params.backward_ref_ts;
 	default:
 		return 0;
 	}
@@ -264,7 +264,7 @@ int frame_gop_schedule_ref(struct preset *preset, unsigned int index)
 {
 	unsigned int gop_start_index;
 	unsigned int pct, pct_next;
-	unsigned int backward_ref_tag, backward_ref_tag_next;
+	unsigned int backward_ref_ts, backward_ref_ts_next;
 	unsigned int i;
 	int rc;
 
@@ -292,14 +292,14 @@ int frame_gop_schedule_ref(struct preset *preset, unsigned int index)
 	 */
 	for (gop_start_index = index; index < preset->frames_count; index++) {
 		pct = frame_pct(preset, index);
-		backward_ref_tag = frame_backward_ref_tag(preset, index);
+		backward_ref_ts = frame_backward_ref_ts(preset, index);
 
 		/* I frames mark GOP end. */
 		if (pct == PCT_I && index > gop_start_index) {
 			break;
 		} else if (pct == PCT_B) {
 			/* The required backward reference frame is already available, queue now. */
-			if (backward_ref_tag >= index)
+			if (backward_ref_ts >= index)
 				rc |= frame_gop_queue(index);
 
 			/* The B frame was already queued before the associated backward reference frame. */
@@ -309,13 +309,13 @@ int frame_gop_schedule_ref(struct preset *preset, unsigned int index)
 		/* Queue B frames before their associated backward reference frames. */
 		for (i = (index + 1); i < preset->frames_count; i++) {
 			pct_next = frame_pct(preset, i);
-			backward_ref_tag_next =
-				frame_backward_ref_tag(preset, i);
+			backward_ref_ts_next =
+				frame_backward_ref_ts(preset, i);
 
 			if (pct_next != PCT_B)
 				continue;
 
-			if (backward_ref_tag_next == index)
+			if (backward_ref_ts_next == index)
 				rc |= frame_gop_queue(i);
 		}
 
