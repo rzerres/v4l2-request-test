@@ -394,7 +394,7 @@ int main(int argc, char *argv[])
 
 	rc = video_engine_start(video_fd, media_fd, width, height,
 				selected_format, preset->type, &video_buffers,
-				config.buffers_count, &video_setup);
+				config.buffers_count, &video_setup, drm_fd);
 	if (rc < 0) {
 		fprintf(stderr, "Unable to start video engine\n");
 		goto error;

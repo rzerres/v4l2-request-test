@@ -221,7 +221,7 @@ bool video_engine_format_test(int video_fd, bool mplane, unsigned int width,
 int video_engine_start(int video_fd, int media_fd, unsigned int width,
 		       unsigned int height, struct format_description *format,
 		       enum codec_type type, struct video_buffer **buffers,
-		       unsigned int buffers_count, struct video_setup *setup);
+		       unsigned int buffers_count, struct video_setup *setup, int drm_fd);
 int video_engine_stop(int video_fd, struct video_buffer *buffers,
 		      unsigned int buffers_count, struct video_setup *setup);
 int video_engine_decode(int video_fd, unsigned int index, union controls *frame,
@@ -242,5 +242,7 @@ int display_engine_show(int drm_fd, unsigned int index,
 			struct video_buffer *video_buffers,
 			struct gem_buffer *buffers,
 			struct display_setup *setup);
+
+int drm_dmabuf_create(int drm_fb, unsigned int width, unsigned int height, struct video_buffer *buffer);
 
 #endif

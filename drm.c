@@ -29,7 +29,6 @@
 #include <unistd.h>
 
 #include <drm_fourcc.h>
-#include <sun4i_drm.h>
 #include <xf86drm.h>
 #include <xf86drmMode.h>
 
@@ -62,6 +61,50 @@ static int create_dumb_buffer(int drm_fd, unsigned int width,
 	return 0;
 }
 
+int drm_dmabuf_create(int drm_fd, unsigned int width, unsigned int height, struct video_buffer *buffer)
+{
+	struct gem_buffer gbuf;
+	int prime_fd = -1;
+	int rc;
+
+	rc = create_dumb_buffer(drm_fd, width, height, 32, &gbuf);
+	if (rc < 0) {
+		fprintf(stderr, "drm dumb buffer alloc failed\n");
+		return -1;
+	}
+
+	drmPrimeHandleToFD(drm_fd, gbuf.handles[0], 0, &prime_fd);
+	if (prime_fd < 0) {
+		fprintf(stderr, "exported prime fd\n");
+		return -1;
+	}
+
+	buffer->destination_buffers_count = 1;
+	buffer->export_fds[0] = prime_fd;
+
+	return 0;
+}
+
+
+/*
+	void *source_map;
+	void *source_data;
+	unsigned int source_size;
+
+	void *destination_map[VIDEO_MAX_PLANES];
+	unsigned int destination_map_lengths[VIDEO_MAX_PLANES];
+	void *destination_data[VIDEO_MAX_PLANES];
+	unsigned int destination_sizes[VIDEO_MAX_PLANES];
+	unsigned int destination_offsets[VIDEO_MAX_PLANES];
+	unsigned int destination_bytesperlines[VIDEO_MAX_PLANES];
+	unsigned int destination_planes_count;
+	unsigned int destination_buffers_count;
+
+	int export_fds[VIDEO_MAX_PLANES];
+	int request_fd;
+*/
+
+#ifdef DRM_IOCTL_SUN4I_GEM_CREATE_TILED
 static int create_tiled_buffer(int drm_fd, unsigned int width,
 			       unsigned int height, unsigned int format,
 			       struct gem_buffer *buffer)
@@ -97,6 +140,7 @@ static int create_tiled_buffer(int drm_fd, unsigned int width,
 
 	return 0;
 }
+#endif
 
 static int create_imported_buffer(int drm_fd, int *import_fds,
 				  unsigned int import_fds_count,
@@ -789,9 +833,11 @@ int display_engine_start(int drm_fd, unsigned int width, unsigned int height,
 						    video_buffer->destination_offsets,
 						    video_buffer->destination_bytesperlines,
 						    buffer);
+#ifdef DRM_IOCTL_SUN4I_GEM_CREATE_TILED
 		else if (format->drm_modifier == DRM_FORMAT_MOD_ALLWINNER_TILED)
 			rc = create_tiled_buffer(drm_fd, width, height,
 						 format->drm_format, buffer);
+#endif
 		else
 			rc = create_dumb_buffer(drm_fd, width, height,
 						format->bpp, buffer);

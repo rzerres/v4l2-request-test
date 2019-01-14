@@ -231,14 +231,14 @@ static int get_format(int video_fd, unsigned int type, unsigned int *width,
 }
 
 static int create_buffers(int video_fd, unsigned int type,
-			  unsigned int buffers_count, unsigned int *index_base)
+			  unsigned int buffers_count, unsigned int *index_base, bool dmabuf)
 {
 	struct v4l2_create_buffers buffers;
 	int rc;
 
 	memset(&buffers, 0, sizeof(buffers));
 	buffers.format.type = type;
-	buffers.memory = V4L2_MEMORY_MMAP;
+	buffers.memory = dmabuf ? V4L2_MEMORY_DMABUF : V4L2_MEMORY_MMAP;
 	buffers.count = buffers_count;
 
 	rc = ioctl(video_fd, VIDIOC_G_FMT, &buffers.format);
@@ -328,7 +328,7 @@ static int request_buffers(int video_fd, unsigned int type,
 
 static int queue_buffer(int video_fd, int request_fd, unsigned int type,
 			uint64_t ts, unsigned int index, unsigned int size,
-			unsigned int buffers_count)
+			unsigned int buffers_count, int dmabuf_fd)
 {
 	struct v4l2_plane planes[buffers_count];
 	struct v4l2_buffer buffer;
@@ -355,6 +355,11 @@ static int queue_buffer(int video_fd, int request_fd, unsigned int type,
 		buffer.request_fd = request_fd;
 	}
 
+	if (dmabuf_fd >= 0) {
+		buffer.m.fd = dmabuf_fd;
+		buffer.memory = V4L2_MEMORY_DMABUF;
+	}
+
 	buffer.timestamp.tv_usec = ts / 1000;
 	buffer.timestamp.tv_sec = ts / 1000000000ULL;
 
@@ -370,7 +375,7 @@ static int queue_buffer(int video_fd, int request_fd, unsigned int type,
 
 static int dequeue_buffer(int video_fd, int request_fd, unsigned int type,
 			  unsigned int index, unsigned int buffers_count,
-			  bool *error)
+			  bool *error, bool dmabuf)
 {
 	struct v4l2_plane planes[buffers_count];
 	struct v4l2_buffer buffer;
@@ -380,7 +385,7 @@ static int dequeue_buffer(int video_fd, int request_fd, unsigned int type,
 	memset(&buffer, 0, sizeof(buffer));
 
 	buffer.type = type;
-	buffer.memory = V4L2_MEMORY_MMAP;
+	buffer.memory = dmabuf ? V4L2_MEMORY_DMABUF : V4L2_MEMORY_MMAP;
 	buffer.index = index;
 	buffer.length = buffers_count;
 	buffer.m.planes = planes;
@@ -592,7 +597,7 @@ bool video_engine_format_test(int video_fd, bool mplane, unsigned int width,
 int video_engine_start(int video_fd, int media_fd, unsigned int width,
 		       unsigned int height, struct format_description *format,
 		       enum codec_type type, struct video_buffer **buffers,
-		       unsigned int buffers_count, struct video_setup *setup)
+		       unsigned int buffers_count, struct video_setup *setup, int drm_fd)
 {
 	struct video_buffer *buffer;
 	unsigned int source_format;
@@ -652,7 +657,7 @@ int video_engine_start(int video_fd, int media_fd, unsigned int width,
 		goto error;
 	}
 
-	rc = create_buffers(video_fd, output_type, buffers_count, NULL);
+	rc = create_buffers(video_fd, output_type, buffers_count, NULL, false);
 	if (rc < 0) {
 		fprintf(stderr, "Unable to create source buffers\n");
 		goto error;
@@ -680,15 +685,19 @@ int video_engine_start(int video_fd, int media_fd, unsigned int width,
 		buffer->source_size = source_length;
 	}
 
-	rc = create_buffers(video_fd, capture_type, buffers_count, NULL);
+	rc = create_buffers(video_fd, capture_type, buffers_count, NULL, true);
 	if (rc < 0) {
 		fprintf(stderr, "Unable to create destination buffers\n");
 		goto error;
 	}
 
+
 	for (i = 0; i < buffers_count; i++) {
 		buffer = &((*buffers)[i]);
 
+		drm_dmabuf_create(drm_fd, format_width, format_height, buffer);
+
+#if 0
 		rc = query_buffer(video_fd, capture_type, i,
 				  destination_map_lengths,
 				  destination_map_offsets,
@@ -771,7 +780,7 @@ int video_engine_start(int video_fd, int media_fd, unsigned int width,
 
 		for (j = 0; j < export_fds_count; j++)
 			buffer->export_fds[j] = -1;
-
+/*
 		rc = export_buffer(video_fd, capture_type, i, O_RDONLY,
 				   buffer->export_fds, export_fds_count);
 		if (rc < 0) {
@@ -779,7 +788,9 @@ int video_engine_start(int video_fd, int media_fd, unsigned int width,
 				"Unable to export destination buffer\n");
 			goto error;
 		}
+*/
 
+#endif
 		rc = ioctl(media_fd, MEDIA_IOC_REQUEST_ALLOC, &request_fd);
 		if (rc < 0) {
 			fprintf(stderr,
@@ -883,14 +894,14 @@ int video_engine_decode(int video_fd, unsigned int index, union controls *frame,
 	}
 
 	rc = queue_buffer(video_fd, request_fd, setup->output_type, ts, index,
-			  source_size, 1);
+			  source_size, 1, -1);
 	if (rc < 0) {
 		fprintf(stderr, "Unable to queue source buffer\n");
 		return -1;
 	}
 
 	rc = queue_buffer(video_fd, -1, setup->capture_type, 0, index, 0,
-			  buffers[index].destination_buffers_count);
+			  buffers[index].destination_buffers_count, buffers[index].export_fds[0]);
 	if (rc < 0) {
 		fprintf(stderr, "Unable to queue destination buffer\n");
 		return -1;
@@ -917,7 +928,7 @@ int video_engine_decode(int video_fd, unsigned int index, union controls *frame,
 	}
 
 	rc = dequeue_buffer(video_fd, -1, setup->output_type, index, 1,
-			    &source_error);
+			    &source_error, false);
 	if (rc < 0) {
 		fprintf(stderr, "Unable to dequeue source buffer\n");
 		return -1;
@@ -925,7 +936,7 @@ int video_engine_decode(int video_fd, unsigned int index, union controls *frame,
 
 	rc = dequeue_buffer(video_fd, -1, setup->capture_type, index,
 			    buffers[index].destination_buffers_count,
-			    &destination_error);
+			    &destination_error, true);
 	if (rc < 0) {
 		fprintf(stderr, "Unable to dequeue destination buffer\n");
 		return -1;
