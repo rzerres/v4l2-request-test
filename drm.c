@@ -82,6 +82,14 @@ int drm_dmabuf_create(int drm_fd, unsigned int width, unsigned int height, struc
 	buffer->destination_buffers_count = 1;
 	buffer->export_fds[0] = prime_fd;
 
+	buffer->planes_count = 2;
+
+	buffer->pitches[0] = width;
+	buffer->offsets[0] = 0;
+
+	buffer->pitches[0] = width / 2;
+	buffer->offsets[1] = width * height;
+
 	return 0;
 }
 
