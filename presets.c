@@ -218,23 +218,6 @@ int frame_controls_fill(struct frame *frame, struct preset *preset,
 
 	memcpy(frame, &preset->frames[index], sizeof(*frame));
 
-	switch (preset->type) {
-	case CODEC_TYPE_MPEG2:
-	case CODEC_TYPE_H264:
-		break;
-#ifdef V4L2_PIX_FMT_HEVC_SLICE
-	case CODEC_TYPE_H265:
-		count = frame->frame.h265.slice_params.num_active_dpb_entries;
-
-		for (i = 0; i < count; i++)
-			frame->frame.h265.slice_params.dpb[i].buffer_index %=
-				buffers_count;
-		break;
-#endif
-	default:
-		return -1;
-	}
-
 	return 0;
 }
 
