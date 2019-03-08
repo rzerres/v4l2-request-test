@@ -509,7 +509,7 @@ static int set_format_controls(int video_fd, int request_fd,
 		  V4L2_CID_MPEG_VIDEO_H264_SCALING_MATRIX,
 		  &frame->h264.scaling_matrix,
 		  sizeof(frame->h264.scaling_matrix) },
-		{ CODEC_TYPE_H264, "scaling matrix",
+		{ CODEC_TYPE_H264, "scaling parameters",
 		  V4L2_CID_MPEG_VIDEO_H264_SLICE_PARAMS,
 		  &frame->h264.slice_param, sizeof(frame->h264.slice_param) },
 #endif
