@@ -140,8 +140,8 @@ static int try_format(int video_fd, unsigned int type, unsigned int width,
 
 	rc = ioctl(video_fd, VIDIOC_TRY_FMT, &format);
 	if (rc < 0) {
-		fprintf(stderr, "Unable to try format for type %d: %s (%d)\n",
-			type, strerror(errno), errno);
+		fprintf(stderr, "Unable to try format for %s (%d): %s (%d)\n",
+			buffer_type[type].name, type, strerror(errno), errno);
 		return -1;
 	}
 
@@ -158,8 +158,8 @@ static int set_format(int video_fd, unsigned int type, unsigned int width,
 
 	rc = ioctl(video_fd, VIDIOC_S_FMT, &format);
 	if (rc < 0) {
-		fprintf(stderr, "Unable to set format for type %d: %s (%d)\n",
-			type, strerror(errno), errno);
+		fprintf(stderr, "Unable to set format for codec %s (%d): %s (%d)\n",
+			codec[type].name, type, strerror(errno), errno);
 		return -1;
 	}
 
@@ -638,31 +638,42 @@ int video_engine_start(int video_fd, int media_fd, unsigned int width,
 
 	rc = set_format(video_fd, output_type, width, height, source_format);
 	if (rc < 0) {
-		fprintf(stderr, "Unable to set source format\n");
+		fprintf(stderr, "Unable to set source format for %s\n",
+			buffer_type[output_type].name);
 		goto error;
 	}
+	else
+		fprintf(stderr, "Set format for source: %s\n",
+			buffer_type[output_type].name);
 
 	destination_format = format->v4l2_format;
 
 	rc = set_format(video_fd, capture_type, width, height,
 			destination_format);
 	if (rc < 0) {
-		fprintf(stderr, "Unable to set destination format\n");
+		fprintf(stderr, "Unable to set destination format for %s\n",
+			buffer_type[capture_type].name);
 		goto error;
 	}
+	else
+		fprintf(stderr, "Set format for destination: %s\n",
+			buffer_type[capture_type].name);
+
 
 	destination_planes_count = format->planes_count;
 
 	rc = get_format(video_fd, capture_type, &format_width, &format_height,
 			destination_bytesperlines, destination_sizes, NULL);
 	if (rc < 0) {
-		fprintf(stderr, "Unable to get destination format\n");
+		fprintf(stderr, "Unable to get destination format for %s\n",
+			buffer_type[capture_type].name);
 		goto error;
 	}
 
 	rc = create_buffers(video_fd, output_type, buffers_count, NULL);
 	if (rc < 0) {
-		fprintf(stderr, "Unable to create source buffers\n");
+		fprintf(stderr, "Unable to create source for %s\n",
+			buffer_type[output_type].name);
 		goto error;
 	}
 
@@ -672,7 +683,8 @@ int video_engine_start(int video_fd, int media_fd, unsigned int width,
 		rc = query_buffer(video_fd, output_type, i, &source_length,
 				  &source_map_offset, 1);
 		if (rc < 0) {
-			fprintf(stderr, "Unable to request source buffer\n");
+			fprintf(stderr, "Unable to request source for %s\n",
+				buffer_type[output_type].name);
 			goto error;
 		}
 
@@ -690,7 +702,9 @@ int video_engine_start(int video_fd, int media_fd, unsigned int width,
 
 	rc = create_buffers(video_fd, capture_type, buffers_count, NULL);
 	if (rc < 0) {
-		fprintf(stderr, "Unable to create destination buffers\n");
+		fprintf(stderr, "Unable to create destination for %s\n",
+  			buffer_type[capture_type].name);
+
 		goto error;
 	}
 
@@ -801,13 +815,15 @@ int video_engine_start(int video_fd, int media_fd, unsigned int width,
 
 	rc = set_stream(video_fd, output_type, true);
 	if (rc < 0) {
-		fprintf(stderr, "Unable to enable source stream\n");
+		fprintf(stderr, "Unable to enable source stream for %s\n",
+			buffer_type[setup->output_type].name);
 		goto error;
 	}
 
 	rc = set_stream(video_fd, capture_type, true);
 	if (rc < 0) {
-		fprintf(stderr, "Unable to enable destination stream\n");
+		fprintf(stderr, "Unable to enable destination stream for %s\n",
+			buffer_type[setup->capture_type].name);
 		goto error;
 	}
 
@@ -830,13 +846,15 @@ int video_engine_stop(int video_fd, struct video_buffer *buffers,
 
 	rc = set_stream(video_fd, setup->output_type, false);
 	if (rc < 0) {
-		fprintf(stderr, "Unable to enable source stream\n");
+		fprintf(stderr, "Unable to enable source stream for %s\n",
+			buffer_type[setup->output_type].name);
 		return -1;
 	}
 
 	rc = set_stream(video_fd, setup->capture_type, false);
 	if (rc < 0) {
-		fprintf(stderr, "Unable to enable destination stream\n");
+		fprintf(stderr, "Unable to enable destination stream for %s\n",
+			buffer_type[setup->capture_type].name);
 		return -1;
 	}
 
@@ -893,13 +911,16 @@ int video_engine_decode(int video_fd, unsigned int index, union controls *frame,
 	rc = queue_buffer(video_fd, request_fd, setup->output_type, ts, index,
 			  source_size, 1);
 	if (rc < 0) {
-		fprintf(stderr, "Unable to queue source buffer\n");
+		fprintf(stderr, "Unable to queue source for %s\n",
+	  		buffer_type[setup->output_type].name);
 		return -1;
 	}
 
 	rc = queue_buffer(video_fd, -1, setup->capture_type, 0, index, 0,
 			  buffers[index].destination_buffers_count);
 	if (rc < 0) {
+		fprintf(stderr, "Unable to queue source for %s\n",
+	  		buffer_type[setup->capture_type].name);
 		fprintf(stderr, "Unable to queue destination buffer\n");
 		return -1;
 	}
@@ -935,7 +956,8 @@ int video_engine_decode(int video_fd, unsigned int index, union controls *frame,
 			    buffers[index].destination_buffers_count,
 			    &destination_error);
 	if (rc < 0) {
-		fprintf(stderr, "Unable to dequeue destination buffer\n");
+		fprintf(stderr, "Unable to dequeue destination for %s\n",
+	  		buffer_type[setup->capture_type].name);
 		return -1;
 	}
 
