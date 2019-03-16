@@ -27,6 +27,8 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <time.h>
+#include <dirent.h>
+//#include <fcntl.h>
 #include <unistd.h>
 
 #include <drm_fourcc.h>
@@ -190,6 +192,75 @@ static void print_summary(struct config *config, struct preset *preset)
 	printf("\n\n");
 }
 
+static int scan_driver_path(char *device_path, struct config *config)
+{
+	int rc = 1;
+	char driver[16];
+	DIR *directory;
+	FILE *file;
+	struct dirent *entry;
+	struct stat statbuf;
+
+	if ((directory = opendir(device_path)) == NULL) {
+	  	//fprintf(stderr,"cannot open device path: %s\n", device_path);
+		return -1;
+	}
+	chdir(device_path);
+	while ((entry = readdir(directory)) != NULL) {
+		lstat(entry->d_name, &statbuf);
+		if (S_ISDIR(statbuf.st_mode)) {
+			/* Found a directory, but ignore . and .. */
+			if (strcmp(".", entry->d_name) == 0 ||
+			    strcmp("..", entry->d_name) == 0)
+				continue;
+		}
+		else if (S_ISLNK(statbuf.st_mode)) {
+			/* For a video device -> recurse to check the name value */
+			if (strcmp (entry->d_name, "video") > 1 ) {
+			        //printf("Rescaning for SymLink: %s\n", entry->d_name);
+				scan_driver_path(entry->d_name, config);
+			}
+			else {
+				//printf("Not iterested in SymLink: %s\n", entry->d_name);
+				continue;
+			}
+		}
+		else if (S_ISREG(statbuf.st_mode) ) {
+			/* Check if device entry is of type cedrus */
+			if (strcmp("name", entry->d_name) == 0) {
+				//printf("File: %s\n", entry->d_name);
+				if ((file = fopen(entry->d_name, "r")) == NULL)
+				{
+					fprintf(stderr, "Error opening video device name: %s\n",
+						entry->d_name);
+					rc = 1;
+					break;
+				}
+
+				fscanf(file,"%[^\n]", driver);
+				fclose(file);
+
+				if (strcmp(V4L2_DRIVER_NAME, driver) == 0) {
+					asprintf(&config->video_path, "/dev/%s", device_path);
+					printf("Found %s driver: %s\n",
+					       driver, config->video_path);
+					rc = 0;
+					break;
+				}
+
+			}
+			//else
+				//printf("Not interested in regular file: %s\n", entry->d_name);
+
+		}
+	}
+
+	chdir("..");
+	closedir(directory);
+
+	return rc;
+}
+
 static long time_diff(struct timespec *before, struct timespec *after)
 {
 	long before_time = before->tv_sec * 1000000 + before->tv_nsec / 1000;
@@ -323,6 +394,16 @@ int main(int argc, char *argv[])
 	int rc;
 
 	setup_config(&config);
+
+	// Scan for usable cedrus driver (like: v4l2-ctl --list-devices)
+	fprintf(stderr, "Scanning for Cedrus Driver in %s\n", V4L2_SYSCLASS_DIR);
+	rc = scan_driver_path(V4L2_SYSCLASS_DIR, &config);
+	if ( rc < 0) {
+		fprintf(stderr, "Unable to find video path\n");
+		goto error;
+	}
+	else
+		fprintf(stderr, "Video device: %s\n", config.video_path);
 
 	while (1) {
 	        int option_index = 0;

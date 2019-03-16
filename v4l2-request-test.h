@@ -31,6 +31,9 @@
 #define TS_REF_INDEX(index) ((index) * 1000)
 #define INDEX_REF_TS(ts) ((ts) / 1000)
 
+#define V4L2_SYSCLASS_DIR  "/sys/class/video4linux"
+#define V4L2_DRIVER_NAME  "cedrus"
+
 /*
  * Structures
  */
