@@ -41,6 +41,10 @@ libdrm_dependency = dependency('libdrm',
 #	sources: [ libdrm_headers ],
 #	include_directories: libdrm_includes)
 
+libudev_dependency = dependency('libudev',
+	method: 'pkg-config',
+	required: true)
+
 #autoconf_data = configuration_data()
 
 #autoconf = configure_file(
@@ -68,7 +72,8 @@ cflags = [
 ]
 
 deps = [
-	libdrm_dependency
+	libdrm_dependency,
+	libudev_dependency
 ]
 
 v4l2_request_test = executable('v4l2-request-test',
