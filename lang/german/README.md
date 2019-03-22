@@ -26,7 +26,50 @@ beschreibt mögliche Werte.
 
 ## Wie es funktioniert
 
-TODO: summarize the functional structure of the code.
+### Namenskonventionen
+
+Die innerhalb des V4L2 Subsystems verwendeten Namen, decken sich nicht mit den Namenskonventionen anderer
+Subsysteme. Die nachfolgende Tabelle gibt Synonyme wieder:
+
+|                 | Subsystem Name |               | Verwendung   |
+|:---------------:|:--------------:|:-------------:|:------------:|
+| **V4L2**        | **Kernel**     | **GStreamer** | **M2M**      |
+| Capture-Buffers | Sink           | Sink          | Output-Queue |
+| Output-Buffers  | Source         | Source        | Input-Queue  |
+|                 |                |               |              |
+
+### Funktionsstruktur
+
+| Ablauf | Function-Name                  | Aufgabe                                               | Parameter                                         |
+|:------|:-------------------------------|:------------------------------------------------------|:--------------------------------------------------|
+| 1      | setup_config()                 | Initialisierung der Strukturen                        |                                                   |
+| 2      | scan_udev_subsystem()          | Scan und Preset der Media-Pfade                       | cedrus: video_path, media_path                    |
+| 3      | preset()                       | Pre-Definiton des auszuwertenden Presets              | Default: bb-mpeg                                  |
+| 4      | set_picture_configs            | Definition der Bild-Parameter                         | Höhe, Breite, buffer.count                        |
+| 5      | open_fd()                      | Deskriptoren initalisieren                            | video_fd,media_fd, drm_fd                         |
+| 6      | test_capabilities()            | Prüfung: Verfügbarkeit erforerlicher V4L2 Fähigkeiten | Streaming (0x04000000), M2M-Mode (native, mplane) |
+| 7      | start_video_engine()           |                                                       |                                                   |
+| 7.1    | set_format()                   |                                                       | codec.source_format                               |
+| 7.2    | set_format()                   |                                                       | v4l2_format                                       |
+| 7.3    | get_format()                   | Sink: Capture-Buffer                                  |                                                   |
+| 7.4    | get_format()                   | Destinatilon: Output-Buffer                           |                                                   |
+| 7.5    | create_buffers()               | Source                                                | video_fd                                          |
+| 7.5.1  | query_buffer()                 |                                                       |                                                   |
+| 7.5.2  | memory_map()                   |                                                       | source_size, source_data                          |
+| 7.6    | create_buffers()               | Sink                                                  | video_fd                                          |
+| 7.6.1  | query_buffer()                 |                                                       |                                                   |
+| 7.6.2  | memory_map()                   |                                                       | length, offset                                    |
+| 7.7    | export_buffers()               | Sink (Problem: # Buffers(M) != # Planes(N))           | m=1 -> size, length->split<br>m=n -> size, (1:1)  |
+| 7.8    | ioctl(MEDIA_IOC_REQUEST_ALLOC) | Create Request API Structures                         | request_fd                                        |
+| 7.9    | set_stream()                   | Source                                                | video_fd                                          |
+| 7.10   | set_stream()                   | Sink                                                  | video_fd                                          |
+| 8      | start_displayq_engine()        |                                                       |                                                   |
+| 9      | progress_frames()              | read in structures from slice_path->slice_filenames   | while(display_count < preset-> display_count)     |
+| 9.1    | frame_gap_schedule()           |                                                       | index                                             |
+| 9.2    | load_data()                    |                                                       | index                                             |
+| 9.3    | frame_control_fill()           |                                                       | index                                             |
+| 9.4    | decode_video_engine()          |                                                       |                                                   |
+| 10     | close()                        |                                                       | request_fd, video_fd, media_fd                    |
 
 ## Presets
 
