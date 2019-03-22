@@ -1,2 +1,6 @@
 /build/
 /v4l2-request-test
+/GPATH
+/GTAGS
+/GRTAGS
+/build-x64/.ninja_deps
