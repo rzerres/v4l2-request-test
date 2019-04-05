@@ -191,7 +191,7 @@ static void print_summary(struct config *config, struct preset *preset)
 	printf("\n\n");
 }
 
-static int scan_udev_subsystem(char *subsystem, struct config *config)
+static int udev_scan_subsystem(char *subsystem, struct config *config)
 {
 	struct udev *udev;
 	struct udev_enumerate *enumerate;
@@ -207,7 +207,7 @@ static int scan_udev_subsystem(char *subsystem, struct config *config)
 		exit(1);
 	}
 
-	/* Create a list of the devices in the ‘hidraw’ subsystem. */
+	/* Create a list of the devices */
 	enumerate = udev_enumerate_new(udev);
 	udev_enumerate_add_match_subsystem(enumerate, subsystem);
 	udev_enumerate_scan_devices(enumerate);
@@ -247,9 +247,22 @@ static int scan_udev_subsystem(char *subsystem, struct config *config)
 				rc = 0;
 			}
 		}
-		else if (strncmp(node_name, "media", 5) == 0 ) {
-		  	//printf(" model: %s\n",
-		  	//		udev_device_get_sysattr_value(dev, "model"));
+		else if (strncmp(node_name, "media", 5) == 0) {
+			printf(" model: %s\n",
+					udev_device_get_sysattr_value(dev, "model"));
+
+			/* media device needs to be a capable video decoder */
+			asprintf(&config->media_path, "%s", node_path);
+			printf(" media-path: %s\n",
+			       config->media_path);
+
+			rc = media_scan_topology(config);
+			if (rc < 0)
+				fprintf(stderr, " model '%s' doesn't offer Video-Decoder\n",
+					udev_device_get_sysattr_value(dev, "model"));
+
+			return 0;
+			/*
 			driver = udev_device_get_sysattr_value(dev, "model");
 			if (strcmp(driver, V4L2_DRIVER_NAME) == 0) {
 				asprintf(&config->media_path, "%s", node_path);
@@ -257,6 +270,7 @@ static int scan_udev_subsystem(char *subsystem, struct config *config)
 					driver, config->media_path);
 				rc = 0;
 			}
+			*/
 		}
 
 		/*
@@ -390,6 +404,7 @@ int main(int argc, char *argv[])
 	struct timespec video_before, video_after;
 	struct timespec display_before, display_after;
 	struct format_description *selected_format = NULL;
+	struct media_entities *media_entities = NULL;
 	bool before_taken = false;
 	void *slice_data = NULL;
 	char *slice_filename = NULL;
@@ -416,19 +431,18 @@ int main(int argc, char *argv[])
 
 	setup_config(&config);
 
-	strcpy(subsystem, "video4linux");
-	fprintf(stderr, "Scanning devices in subsystem '%s' ...\n", subsystem);
-	rc = scan_udev_subsystem(subsystem, &config);
-	if ( rc < 0) {
-		fprintf(stderr, "Unable to autoscan suitable Video device in subsystem '%s'\n", subsystem);
-	}
-
+	fprintf(stderr, "Scanning for suitable v4l2 Video-Decoder ...\n");
 	strcpy(subsystem, "media");
 	fprintf(stderr, "Scanning devices in subsystem '%s' ...\n", subsystem);
-	rc = scan_udev_subsystem(subsystem, &config);
-	if ( rc < 0) {
+	rc = udev_scan_subsystem(subsystem, &config);
+	if (rc < 0)
 		fprintf(stderr, "Unable to autoscan suitable Media device in subsystem '%s'\n", subsystem);
-	}
+
+	strcpy(subsystem, "video4linux");
+	fprintf(stderr, "Scanning devices in subsystem '%s' ...\n", subsystem);
+	rc = udev_scan_subsystem(subsystem, &config);
+	if (rc < 0)
+		fprintf(stderr, "Unable to autoscan suitable Video device in subsystem '%s'\n", subsystem);
 
 	while (1) {
 		int option_index = 0;
@@ -520,6 +534,8 @@ int main(int argc, char *argv[])
 		asprintf(&config.slices_path, "data/%s", config.preset_name);
 
 	print_summary(&config, preset);
+
+	goto complete;
 
 	video_fd = open(config.video_path, O_RDWR | O_NONBLOCK, 0);
 	if (video_fd < 0) {
