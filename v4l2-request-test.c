@@ -55,56 +55,56 @@ const struct codec codec[] = {
 
 const struct buffer_type buffer_type[] = {
 	{
-	 	.name	= "Video Capture Buffer",
-	 	.type	= V4L2_BUF_TYPE_VIDEO_CAPTURE
+		.name	= "Video Capture Buffer",
+		.type	= V4L2_BUF_TYPE_VIDEO_CAPTURE
 	},
 	{
-	 	.name	= "Video Output Buffer",
-	 	.type	= V4L2_BUF_TYPE_VIDEO_OUTPUT
+		.name	= "Video Output Buffer",
+		.type	= V4L2_BUF_TYPE_VIDEO_OUTPUT
 	},
 	{
-	 	.name	= "Video Overlay Buffer",
-	 	.type	= V4L2_BUF_TYPE_VIDEO_OVERLAY
+		.name	= "Video Overlay Buffer",
+		.type	= V4L2_BUF_TYPE_VIDEO_OVERLAY
 	},
 	{
-	 	.name	= "VBI Capture Buffer",
-	 	.type	= V4L2_BUF_TYPE_VBI_CAPTURE
+		.name	= "VBI Capture Buffer",
+		.type	= V4L2_BUF_TYPE_VBI_CAPTURE
 	},
 	{
-	 	.name	= "VBI Output Buffer",
-	 	.type	= V4L2_BUF_TYPE_VBI_OUTPUT
+		.name	= "VBI Output Buffer",
+		.type	= V4L2_BUF_TYPE_VBI_OUTPUT
 	},
 	{
-	 	.name	= "Sliced VBI Capture Buffer",
-	 	.type	= V4L2_BUF_TYPE_SLICED_VBI_CAPTURE
+		.name	= "Sliced VBI Capture Buffer",
+		.type	= V4L2_BUF_TYPE_SLICED_VBI_CAPTURE
 	},
 	{
-	 	.name	= "Sliced VBI Output Buffer",
-	 	.type	= V4L2_BUF_TYPE_SLICED_VBI_OUTPUT
+		.name	= "Sliced VBI Output Buffer",
+		.type	= V4L2_BUF_TYPE_SLICED_VBI_OUTPUT
 	},
 	{
-	 	.name	= "Video Output Overlay Buffer",
-	 	.type	= V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY
+		.name	= "Video Output Overlay Buffer",
+		.type	= V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY
 	},
 	{
-	 	.name	= "Video Multi-Plane Capture Buffer",
-	 	.type	= V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE
+		.name	= "Video Multi-Plane Capture Buffer",
+		.type	= V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE
 	},
 	{
-	 	.name	= "Video Multi-Plane Output Buffer",
-	 	.type	= V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE
+		.name	= "Video Multi-Plane Output Buffer",
+		.type	= V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE
 	},
 	{
-	 	.name	= "SDR Capture Buffer",
-	 	.type	= V4L2_BUF_TYPE_SDR_CAPTURE
+		.name	= "SDR Capture Buffer",
+		.type	= V4L2_BUF_TYPE_SDR_CAPTURE
 	},
 	{
-	 	.name	= "SDR Output Buffer",
-	 	.type	= V4L2_BUF_TYPE_SDR_OUTPUT
+		.name	= "SDR Output Buffer",
+		.type	= V4L2_BUF_TYPE_SDR_OUTPUT
 	},
 	{
-	 	.name	= "Meta Capture Buffer",
-	 	.type	= V4L2_BUF_TYPE_META_CAPTURE
+		.name	= "Meta Capture Buffer",
+		.type	= V4L2_BUF_TYPE_META_CAPTURE
 	}
 };
 
@@ -238,10 +238,10 @@ static int scan_udev_subsystem(char *subsystem, struct config *config)
 		   the device attributes. Strings returned from
 		   udev_device_get_sysattr_value() are UTF-8 encoded.
 		*/
-		if (strncmp(node_name, "video", 5) == 0 ) {
+		if (strncmp(node_name, "video", 5) == 0) {
 			driver = udev_device_get_sysattr_value(dev, "name");
 			if (strcmp(driver, V4L2_DRIVER_NAME) == 0) {
-			  	asprintf(&config->video_path, "%s", node_path);
+				asprintf(&config->video_path, "%s", node_path);
 				printf("Found video-driver %s: %s\n",
 					driver, config->video_path);
 				rc = 0;
@@ -252,7 +252,7 @@ static int scan_udev_subsystem(char *subsystem, struct config *config)
 		  	//		udev_device_get_sysattr_value(dev, "model"));
 			driver = udev_device_get_sysattr_value(dev, "model");
 			if (strcmp(driver, V4L2_DRIVER_NAME) == 0) {
-			  	asprintf(&config->media_path, "%s", node_path);
+				asprintf(&config->media_path, "%s", node_path);
 				printf("Found media-model %s: %s\n",
 					driver, config->media_path);
 				rc = 0;
@@ -431,7 +431,7 @@ int main(int argc, char *argv[])
 	}
 
 	while (1) {
-	        int option_index = 0;
+		int option_index = 0;
 		static struct option long_options[] = {
 			{ "device",        required_argument, 0, 'v' },
 			{ "video-device",  required_argument, 0, 'v' },
