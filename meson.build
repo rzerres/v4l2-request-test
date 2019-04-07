@@ -26,39 +26,25 @@ project('v4l2-request-test', 'c',
 
 cc = meson.get_compiler('c')
 
-#libdrm_headers = [
-#	'drm_fourcc.h'
-#]
-
-#libdrm_includes = [
-#	include_directories('include')
-#]
-
 libdrm_dependency = dependency('libdrm',
 	version: '>= 2.4.52',
 	method: 'pkg-config',
 	required: true)
-#	sources: [ libdrm_headers ],
-#	include_directories: libdrm_includes)
 
 libudev_dependency = dependency('libudev',
 	method: 'pkg-config',
 	required: true)
 
-#autoconf_data = configuration_data()
-
-#autoconf = configure_file(
-#	output: 'autoconfig.h',
-#	configuration: autoconf_data)
-
 sources = [
 	'drm.c',
 	'presets.c',
 	'v4l2.c',
+	'v4l2-topology.c',
 	'v4l2-request-test.c'
 ]
 
 headers = [
+	'v4l2-topology.h',
 	'v4l2-request-test.h'
 ]
 
