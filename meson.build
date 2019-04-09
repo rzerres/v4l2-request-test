@@ -38,12 +38,14 @@ libudev_dependency = dependency('libudev',
 sources = [
 	'drm.c',
 	'presets.c',
+	'decoder_vector.c',
 	'v4l2.c',
 	'v4l2-topology.c',
 	'v4l2-request-test.c'
 ]
 
 headers = [
+	'decoder_vector.h',
 	'v4l2-topology.h',
 	'v4l2-request-test.h'
 ]
